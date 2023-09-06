@@ -1,4 +1,4 @@
-from .featureClass import FeatureClass.LEER
+from .featureClass import LEER
 
 __version__ = "0.0.1"
 __autor__= "INEGI"

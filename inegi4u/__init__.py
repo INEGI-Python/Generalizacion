@@ -7,4 +7,4 @@ def LEER(d,t,p=0,f="*",e=[0,1]):
 def TOPOLOGIA(d,t,p):
     return TOPOLOGIA(d,t,p)
 
-__ALL__ = ["leer","topologia"]
+__ALL__ = ["LEER","TOPOLOGIA"]

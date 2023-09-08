@@ -6,8 +6,7 @@ def valid(d):
     if len(d) != 2:    
         print("Falta ruta de GDB o de FeatureClass. Array d = %d pos, deben ser 2" % len(d))
         exit(1)
-    else:
-        env.workspace = d[0]
+    env.workspace = d[0]
 def LEER(d,t,f="*",p=0,e=[0,1]):
     valid(d)
     lee = lambda x:list(da.SearchCursor(d[1],f))

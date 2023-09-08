@@ -1,4 +1,4 @@
-from .codigo import LEER as _leer,TOPOLOGIA as _topo
+from .codigo import _leer,_topo
 
 __version__ = "1.0.0"
 

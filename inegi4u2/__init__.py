@@ -1,4 +1,4 @@
-from .feature import leer, actualizar, eliminar
+from .feature import feature, leer, actualizar, eliminar
 
 __version__="1.0"
 

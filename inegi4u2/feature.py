@@ -1,6 +1,6 @@
 import numpy
 import datetime
-class feature:
+class feature(object):
     def leer():
         return "Aqui va el código que leera un FeatureClass y lo devolvera en un formato especifico. DataFrame, Array_numpy, array"
     def actualizar(u):

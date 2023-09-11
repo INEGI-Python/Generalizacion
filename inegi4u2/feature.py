@@ -7,4 +7,4 @@ class feature(object):
         obj={"status":True,"data":[],"fecha":datetime.time(),"user":u}
         return obj
     def eliminar(e):
-        return numpy.array(54,88,99,3,81,3)
+        return numpy.array(54,88,99,3,81,e)

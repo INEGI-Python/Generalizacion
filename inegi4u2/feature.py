@@ -1,8 +1,8 @@
 import numpy
 
 def leer():
-  return "LEER"
+  return "Aqui va el código que leera un FeatureClass y lo devolvera en un formato especifico. DataFrame, Array_numpy, array"
 def actualizar():
-  return "ACTUALIZA"
+  return "Codigo donde se actualizac algo"
 def eliminar():
-  return "ELIMNA"
+  return "Aqui poner codigo para eliminmar algo.  "

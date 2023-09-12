@@ -1,13 +1,13 @@
-from .feature import feature, leer, actualizar, eliminar
+from .feature import feature
 
 __version__="1.0"
 
 def leer():
-    return feature().leer()
+    return feature.leer()
 def actualizar(_u):
-    return feature().actualizar(_u)
+    return feature.actualizar(_u)
 def eliminar(_u):
-    return feature().eliminar(_u)
+    return feature.eliminar(_u)
                    
 
 

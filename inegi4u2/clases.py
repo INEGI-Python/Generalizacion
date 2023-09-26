@@ -104,7 +104,7 @@ class operaciones:
     def trunCoord(_s,_c):
         return [round(c,6) for c in _c]
     def inter(_s,_p,op):
-        if _s.interC.has_key(_p):
+        if (True if _p in _s.interC.keys() else False):
             if op:
                 return _s.interC[_p]
             else:

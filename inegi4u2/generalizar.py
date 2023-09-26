@@ -3,7 +3,6 @@ from clases import reduceLineas,linea,nodo,operaciones
 import os,sys
 from time import time as t
 import pandas as pd
-from arcpy import env as e
 from arcpy import MakeFeatureLayer_management as mF
 from arcpy import da
 from arcpy import FeatureVerticesToPoints_management as fV
@@ -25,7 +24,7 @@ class generalizar:
         pass
     
 
-    def start(db,fet,vuelta,td,opc): 
+    def start(s,db,fet,vuelta,td,opc): 
         _c_ = "capa%d" %vuelta
         _res_ = "resul%d" % vuelta
         mF(db+fet,_c_)
@@ -113,6 +112,7 @@ class generalizar:
         td = pt.replace("-","").replace(":","").replace(".","").replace(" ","_")
         ini = t()
         db = _arg[1]+"\\" if _arg[1][1] == ":" else os.getcwd()+"\\"+_arg[1]+"\\"
+        from arcpy import env as e
         e.workspace = db
         e.overwriteOutput=True
         o = operaciones()
@@ -136,6 +136,6 @@ class generalizar:
         except Exception as e: 
             opc["op3"] =  0
         while True:
-            vuelta += start(db,capa,vuelta,td,opc)
+            vuelta += s.start(db,capa,vuelta,td,opc)
             capa = "lineas%d" % (vuelta-1)
             print("   *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* ")

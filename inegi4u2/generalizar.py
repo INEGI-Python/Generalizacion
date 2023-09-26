@@ -21,7 +21,7 @@ warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
 class generalizar:
     def __init__(self):
-        pass
+        self._arg=[]
     
 
     def start(s,db,fet,vuelta,td,opc): 
@@ -31,7 +31,7 @@ class generalizar:
         op = operaciones()
         #op.EliminarCasiTodo([m,Lfc,dm],["resul"],5)
         op.crearIndice(_c_,[da,lF,addF,addI])
-        rL = reduceLineas(_c_,int(_arg[3]))
+        rL = reduceLineas(_c_,int(s._arg[3]))
         cFm(_c_,"lineas%d" %vuelta)
         mF(db+"lineas%d" %vuelta,_res_)
         nd = "nodos%d" %vuelta
@@ -104,6 +104,7 @@ class generalizar:
 
 
     def lineas(s,_arg):
+        s._arg=_arg
         if len(_arg)<5:
             print("[error] ERROR DE ARGUMENTOS. Numero de argumentos invalido. Se esperan 4 argumentos al menos")
             exit(1)

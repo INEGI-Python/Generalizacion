@@ -12,7 +12,7 @@ from arcpy import Delete_management as dm
 from arcpy import ListFields as lF
 from arcpy import AddField_management as addF
 from arcpy import AddIndex_management as addI
-from arcpy import management as m
+
 from datetime import datetime
 from operator import itemgetter
 from pandas.core.common import SettingWithCopyWarning
@@ -113,6 +113,7 @@ class generalizar:
         ini = t()
         db = _arg[1]+"\\" if _arg[1][1] == ":" else os.getcwd()+"\\"+_arg[1]+"\\"
         from arcpy import env as e
+        from arcpy import management as m
         e.workspace = db
         e.overwriteOutput=True
         o = operaciones()

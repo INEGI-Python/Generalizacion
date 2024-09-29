@@ -1,8 +1,8 @@
-import numpy as np
+#import numpy as np
 import fiona as fio
 import geopandas as gpd
 import folium as fol
-import matplotlib.pyplot as  plt
+#import matplotlib.pyplot as  plt
 import atajos as ata
 from time import time as t
 import shapely as sh
@@ -25,11 +25,11 @@ def algoritmo(dfs,_c):
 			for j in range(i+1,_c):
 				p2 = datTmp(j)				
 				if p2:
-					print(p2)
+					#print(p2)
 					dist = ((p2['xy'][0]-p1['xy'][0])**2+(p2['xy'][1]-p1['xy'][1])**2)**0.5
 					if dist<=ata.distancia:
 						dfs[i]['properties']['distancia']['vecinos'].append(dfs[j]['properties']["OBJECTID"])
-						print(dfs)
+						#print(dfs)
 						if p1["hab"]>=p2["hab"]:
 							visible(dfs[j],0)
 							visible(dfs[i],1)

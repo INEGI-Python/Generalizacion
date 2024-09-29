@@ -65,7 +65,7 @@ gpos.set_index("id")
 cont = gpos.count(numeric_only=True)['id']
 agrupados = _dataF.sjoin(gpos,how="inner",predicate='intersects')
 agrupados["gpo"]=agrupados['index_right1']
-agrupados = agrupados.drop(columns=['index_right0','index_right1'])
+#agrupados = agrupados.drop(columns=['index_right0','index_right1'])
 print("GRUPOS: %d" % cont)
 porGPO = agrupados.groupby(by="id").groups
 oid = agrupados["OBJECTID"]

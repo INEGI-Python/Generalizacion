@@ -4,6 +4,6 @@ def sepa(c="*-*-"):
 def imp(text):
     print("[info]  %s" % str(text))
     
-GDB="datos/Generalizacion_1.gdb"
+GDB="datos/Generalizacion.gdb"
 distancia = 0
 data,geometry=[],[]

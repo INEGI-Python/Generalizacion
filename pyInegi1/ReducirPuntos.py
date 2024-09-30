@@ -18,7 +18,7 @@ import pandas as pd
 t1 = t()
 lys= fio.listlayers(GDB)
 print(lys)
-_dataF = gpd.read_file(GDB,layer="BCs_",columns=["cve_edo","cve_mun","cve_loc","nombre","num_hab"])
+_dataF = gpd.read_file(GDB,layer="BCs",columns=["cve_edo","cve_mun","cve_loc","nombre","num_hab"])
 data = [dict(vecinos=[dict(idx=i,pob=h,visi=True)]) for i,h in zip(_dataF.index,_dataF['num_hab'])]
 #_dataF["idx"]=_dataF.index
 _dataF["gpo"]=0
@@ -47,41 +47,34 @@ for i in gpos.id:
 	imp("Anlizando grupo %d. Localidades del grupo: %d " % (i,_cantG))
 	if _cantG==1:
 		agrupados.loc[porGPO[i][0],'isvisible'] = True
-		buf = agrupados.loc[porGPO[i][0],'geometry'].buffer(distancia)
-		polyDist(buf,porGPO[i][0])
 	else:
 		gpoX = agrupados.iloc[porGPO[i]]
 		for _g in gpoX.index:
-			#imp("Elemento %d " % _g)
 			buf = gpoX.loc[_g,'geometry'].buffer(distancia)			
 			res = gpoX[gpoX.loc[:,'geometry'].intersects(buf)]
-			data = [dict(idx=i,pob=n,visi=v) for i,n,v in zip(res.index,res['num_hab'],res['isvisible'])]			
+			data = [dict(idx=i,pob=n,visi=v) for i,n,v in zip(res.index,res['num_hab'],res['isvisible']) if v and i!=_g]			
 			pob=gpoX.loc[_g]['num_hab']
 			vis=gpoX.loc[_g]['isvisible']
 			agrupados.loc[_g,'distancia']={'vecinos':data}.values().mapping
 			
-			for a in [aux for aux in data[1:] if aux['visi']==1]:
-				if pob>=a['pob']:
-					agrupados.loc[a['idx'],'isvisible'] = False  
-				else:
-					agrupados.loc[a['idx'],'isvisible'] = True
-					agrupados.loc[_g,'isvisible'] = False
-					break
-   			
-   
+			looser = [a['idx'] for a in data if pob>=a['pob']]
+			agrupados.loc[looser,'isvisible'] = False  
 
-pol = gpd.GeoDataFrame(data=datos,geometry=geometria,crs=CRS)
+geometria=agrupados.loc[agrupados['isvisible']==True,].buffer(distancia)
+locas=agrupados.loc[:,'geometry'].intersects(geometria)
+
+pol = gpd.GeoDataFrame(geometry=geometria,crs=CRS)
 pVisibles = gpd.GeoDataFrame(data=agrupados.loc[:,['isvisible','distancia','gpo','num_hab']].to_dict(),geometry=[sh.Point(*list(g['geometry']['coordinates'][0])) for g in agrupados.__geo_interface__['features']],crs=CRS)
 print("Tiempo: %.3f " % float(t()-t1))
 imp("Creando Mapa...")
 
-m=pVisibles.explore(column='isvisible',cmap=colores,marker_kwds=dict(radius=3, fill=True),legend=False,name="Localidades",popup=['isvisible','num_hab','gpo'])
-pol.explore(m=m,column="id",color="grey",name="Grupos",legend=False,popup=["id"])
+m=pVisibles.explore(column='isvisible',cmap=["gray","red"],marker_kwds=dict(radius=4, fill=True),legend=False,name="Localidades",popup=['isvisible','num_hab','gpo'])
+pol.explore(m=m,color="#FFF",name="Poligono prueba",legend=False)
 fol.TileLayer("OpenStreetMap",show=True).add_to(m)
 fol.LayerControl().add_to(m)
+m
 
-
-m.show_in_browser()
+#m.show_in_browser()
 
 #p1,p2 = [31.740804466331763, -115.06898870453817],[31.958902441793633, -114.74387815347139]
 #dista = (p2[0]-p1[0])/(p2[1]-p1[1])

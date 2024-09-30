@@ -4,11 +4,11 @@ def sepa(c="*-*-"):
 
 def imp(text):
     t = dt.datetime.today()
-    print("[%s]  %s" % (t,str(text)))
+    print("|%s|  %s" % (t,str(text)))
 
 def colores(v):
     return "red" if v==True else "gray"
 
-GDB="datos/Generalizacion.gdb"
+gdb="datos/Generalizacion.gdb"
 distancia = 0
 datos,geometria=[],[]

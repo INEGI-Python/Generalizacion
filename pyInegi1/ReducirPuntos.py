@@ -74,9 +74,7 @@ def main(**params):
 	for i in gpos.id:   ##  GRUPOS
 		_cantG=len(porGPO[i])
 		imp("Grupo %d »» No. elementos: %d " % (i,_cantG))
-		if _cantG==1:
-			agrupados.loc[porGPO[i][0],'isvisible'] = True
-		else:
+		if _cantG>1:
 			gpoX = agrupados.iloc[porGPO[i]]
 			gpoX = gpoX.sort_values(by="num_hab",ascending=False)
 			for _g in gpoX.index:

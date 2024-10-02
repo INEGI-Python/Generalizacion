@@ -9,6 +9,10 @@ class Basico:
         with fiona.open(shp) as shapefile:
             for record in shapefile:
                 print(record)
+    def importFeat(s,gdb,feat,campos=None):
+        import geopandas as gpd
+        capa = gpd.read_file(gdb,layer=feat,columns=campos)
+        return capa
 
 
 

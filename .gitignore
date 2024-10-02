@@ -1,2 +1,6 @@
 /pyInegi1/datos
 *.gdb
+*.shp
+*.dbf
+*.prj
+*.shx

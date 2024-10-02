@@ -4,7 +4,7 @@ def sepa(c="*-*-"):
 
 def imp(text):
     t = dt.datetime.today()
-    print("|%s|  %s" % (t,str(text)))
+    print("|%s|  %s" % (str(t)[5:-5],str(text)))
 
 def colores(v):
     return "red" if v==True else "gray"

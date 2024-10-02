@@ -6,11 +6,6 @@ from time import time as t
 import shapely as sh
 
 
-def polyDist(buf,_i):
-	geometria.append(buf)
-	datos.append({'id':_i})
- 
- 
 def crearGpos(_dataF,CRS):
 	imp("Buscando Localidades Cercanas para agruparlas")
 	bu = _dataF.buffer((distancia/2)+1)
@@ -32,28 +27,30 @@ def crearGpos(_dataF,CRS):
 
 
 def crearMapa(**capas):
-	agrupados=capas['a']
+	_cap=capas['a']
 	CRS=capas['b']
 	geomDF=capas['c']
 	imp("Creando Mapa...")
-	pVisibles = gpd.GeoDataFrame(data=agrupados.loc[:,['isvisible','distancia','gpo','num_hab']].to_dict(),geometry=[sh.Point(*list(g['geometry']['coordinates'][0])) for g in agrupados.__geo_interface__['features']],crs=CRS)
-	m=pVisibles.explore(column='isvisible',cmap=["gray","red"],marker_kwds=dict(radius=4, fill=True),legend=False,name="Localidades",popup=['isvisible','num_hab','gpo'])
-	geomDF.explore(m=m,color="#FFF",name="Poligono prueba",legend=False)
-	fol.TileLayer("OpenStreetMap",show=True).add_to(m)
-	fol.LayerControl().add_to(m)
-	m.show_in_browser()
+	m1=_cap["Visible"][0].explore(color=_cap["Visible"][1],tooltip=['nombre'],marker_type="circle",style_kwds=dict(color="darkblue",weight=5,opacity=1),marker_kwds=dict(radius=4, fill=True,draggable=True),legend=False,name="Visibles",popup=['nombre','num_hab','gpo'])
+	m2=_cap["Ocultas"][0].explore(m=m1,color=_cap["Ocultas"][1],tooltip=['nombre'],marker_type="circle",style_kwds=dict(color="gray",weight=3,opacity=0.6),marker_kwds=dict(radius=2, fill=True),legend=False,name="Ocultas",popup=['nombre','num_hab','gpo'])
+	geomDF.explore(m=m2,color="#AAF", tooltip=False,name="Poligono prueba",legend=False)
+	fol.TileLayer("OpenStreetMap",show=True).add_to(m2)
+	#gjson= fol.GeoJson(_cap["Visible"][0]).add_to(m2)
+	#fol.GeoJsonPopup(fields=['nombre','gpo','num_hab'],labels=False).add_to(gjson)
+	fol.LayerControl().add_to(m2)
+	m2.show_in_browser()
  
  
 
 def main(**params):
 	imp(params)
 	gdb = params['gdb']
-	capa = params['feat']
+	feat = params['feat']
 	distancia = params['dist']
+	ver = params['ver']
  
 	t1 = t()
-	_dataF = gpd.read_file(gdb,layer=capa,columns=["cve_edo","cve_mun","cve_loc","nombre","num_hab"])
-#	data = [dict(vecinos=[dict(idx=i,pob=h)]) for i,h in zip(_dataF.index,_dataF['num_hab'])]
+	_dataF = gpd.read_file(gdb,layer=feat,columns=["cve_edo","cve_mun","cve_loc","nombre","num_hab"])
 	_dataF["gpo"]=0
 	_dataF["isvisible"]=True
 	_dataF["distancia"]=object()  #pd.DataFrame(data={'data':data})
@@ -76,7 +73,7 @@ def main(**params):
 
 	for i in gpos.id:   ##  GRUPOS
 		_cantG=len(porGPO[i])
-		imp("Anlizando grupo %d. Localidades del grupo: %d " % (i,_cantG))
+		imp("Grupo %d »» No. elementos: %d " % (i,_cantG))
 		if _cantG==1:
 			agrupados.loc[porGPO[i][0],'isvisible'] = True
 		else:
@@ -85,40 +82,37 @@ def main(**params):
 			for _g in gpoX.index:
 				buf = gpoX.loc[_g,'geometry'].buffer(distancia)			
 				res = gpoX[gpoX.loc[:,'geometry'].intersects(buf)]
-				data = [dict(idx=i,pob=n) for i,n,v in zip(res.index,res['num_hab'],res['isvisible']) if v and i!=_g]			
-				pob=gpoX.loc[_g]['num_hab']
-				agrupados.loc[_g,'distancia']={'vecinos':data}.values().mapping
-				
-				looser = [a['idx'] for a in data if pob>=a['pob']]
-				agrupados.loc[looser,'isvisible'] = False  
-	agrupados.to_file("datos/%s-Parte1.shp" % capa)
-	geometria=agrupados.loc[agrupados['isvisible']==True,].buffer(distancia)
-	geomDF = gpd.GeoDataFrame(geometry=geometria,crs=CRS)
-	locas=agrupados.intersection(geomDF.union_all(),align=True)
-	segus = agrupados.loc[locas[locas.is_empty].index,]
-	crearMapa(a=agrupados,b=CRS,c=geomDF)  
-	segus.to_file("datos/%s-Restantes.shp" % capa)
- 
- 
-	# from zipfile import ZipFile
-	# with ZipFile("datos/%s.zip","w") as sip:
-	# 	for z in ["shp","shx","dbf","prj"]:
-	# 		sip.write("datos/%s.%s" % (name,z))
-	# 	sip.close()
-
-	print("Tiempo: %.3f " % float(t()-t1))
-
+				if res.loc[_g,"isvisible"]:
+					data = [dict(idx=i,pob=n) for i,n,v in zip(res.index,res['num_hab'],res['isvisible']) if v and i!=_g]
+					if len(data)>0:
+						looser = [a['idx'] for a in data]
+						agrupados.loc[looser,'isvisible'] = False
+						gpoX.loc[looser,'isvisible'] = False
+    
+	imp("Tiempo del algoritmo: %.3f " % float(t()-t1))
+	imp("Guardando resultado...")
+	agrupados.to_file("RESULT-%s.shp" % feat)
+	if ver==1:
+		visibles = agrupados.loc[agrupados['isvisible']==True,]
+		ocultar = agrupados.loc[agrupados['isvisible']==False,]
+		geometria=visibles.loc[visibles.index,].buffer(distancia)
+		geomDF = gpd.GeoDataFrame(geometry=geometria,crs=CRS)
+		locas=agrupados.intersection(geomDF.union_all(),align=True)
+		segus = agrupados.loc[locas[locas.is_empty].index,]
+		DF_visi = gpd.GeoDataFrame(data=visibles.loc[:,['nombre','gpo','num_hab']].to_dict(),geometry=[sh.Point(*list(g['geometry']['coordinates'][0])) for g in visibles.__geo_interface__['features']],crs=CRS)
+		DF_ocul = gpd.GeoDataFrame(data=ocultar.loc[:,['nombre','gpo','num_hab']].to_dict(),geometry=[sh.Point(*list(g['geometry']['coordinates'][0])) for g in ocultar.__geo_interface__['features']],crs=CRS)
+		crearMapa(a={"Visible":[DF_visi,"red"],"Ocultas":[DF_ocul,"gray"]},b=CRS,c=geomDF)  
+	
 
 
 
 if __name__ == "__main__":
 	parser = ag.ArgumentParser(description="Esta aplicacion generaliza una capa  de   tipo punto, reduciendo la cantidad de elementos basados en una distancia dada")
-	parser.add_argument('GDB',type=str, nargs='?', default="datos/Generalizacion.gdb", help="Ruta absoluta o relativa  de  la geodatabase")
-	parser.add_argument('FEAT',type=str, nargs='?', default="Localidad_2021", help="Rutal relativa a la geodatabase donde se encuentra el featureclass a generalizar")
-	parser.add_argument("DIST",type=int,nargs='?',default=20000,help="Distancia en metros que deberan de existir entre dos puntos del resultado")
+	parser.add_argument('GDB',type=str, help="Ruta absoluta o relativa  de  la geodatabase")
+	parser.add_argument('FEAT',type=str, help="Nombre del featureclass a generalizar")
+	parser.add_argument("DIST",type=int, nargs='?', default=20000, help="Distancia en metros que deberan de existir entre dos puntos del resultado. Default: 20000")
+	parser.add_argument("VER",type=int, nargs='?', default=1, help="Genera y muestra un Mapa Web con el resultado. Default: 1")	
 	args = parser.parse_args()
-	main(gdb=args.GDB,feat=args.FEAT,dist=args.DIST)
-#m.show_in_browser()
-
-
-## ['Chis_min_2', 'localidad250', 'Localidad_2021', 'Cercanos_geo', 'BCs']
+	main(gdb=args.GDB,feat=args.FEAT,dist=args.DIST,ver=args.VER)
+else:
+    main(gdb='datos/Generalizacion.gdb', feat='BCs_', dist=20000,ver=1) 

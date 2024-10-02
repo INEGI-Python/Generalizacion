@@ -46,11 +46,12 @@ def main(**params):
 	imp(params)
 	gdb = params['gdb']
 	feat = params['feat']
+	camp = params["camp"]
 	distancia = params['dist']
 	ver = params['ver']
- 
+
 	t1 = t()
-	_dataF = gpd.read_file(gdb,layer=feat,columns=["cve_edo","cve_mun","cve_loc","nombre","num_hab"])
+	_dataF = gpd.read_file(gdb,layer=feat,columns=["cve_edo","cve_mun","cve_loc","nombre"]+camp)
 	_dataF["gpo"]=0
 	_dataF["isvisible"]=True
 	_dataF["distancia"]=object()  #pd.DataFrame(data={'data':data})
@@ -76,20 +77,20 @@ def main(**params):
 		imp("Grupo %d »» No. elementos: %d " % (i,_cantG))
 		if _cantG>1:
 			gpoX = agrupados.iloc[porGPO[i]]
-			gpoX = gpoX.sort_values(by="num_hab",ascending=False)
+			gpoX = gpoX.sort_values(by=camp,ascending=[True,False])
 			for _g in gpoX.index:
-				buf = gpoX.loc[_g,'geometry'].buffer(distancia)			
+				buf = gpoX.loc[_g,'geometry'].buffer(distancia)
 				res = gpoX[gpoX.loc[:,'geometry'].intersects(buf)]
 				if res.loc[_g,"isvisible"]:
-					data = [dict(idx=i,pob=n) for i,n,v in zip(res.index,res['num_hab'],res['isvisible']) if v and i!=_g]
-					if len(data)>0:
-						looser = [a['idx'] for a in data]
+					data = [dict(idx=i,pob=n,jer=j) for i,n,v,j in zip(res.index,res['num_hab'],res['isvisible'],res[camp[0]]) if v and i!=_g]
+					if data:
+						looser = [a['idx'] for a in data if a['jer']>0]
 						agrupados.loc[looser,'isvisible'] = False
 						gpoX.loc[looser,'isvisible'] = False
-    
+
 	imp("Tiempo del algoritmo: %.3f " % float(t()-t1))
 	imp("Guardando resultado...")
-	agrupados.to_file("RESULT-%s.shp" % feat)
+	agrupados.to_file(f"RESULT-{feat}.shp")
 	if ver==1:
 		visibles = agrupados.loc[agrupados['isvisible']==True,]
 		ocultar = agrupados.loc[agrupados['isvisible']==False,]
@@ -107,14 +108,16 @@ def main(**params):
 if __name__ == "__main__":
 	parser = ag.ArgumentParser(description="Esta aplicacion generaliza una capa  de   tipo punto, reduciendo la cantidad de elementos basados en una distancia dada")
 	parser.add_argument('GDB',type=str, help="Ruta absoluta o relativa  de  la geodatabase")
-	parser.add_argument('FEAT',type=str, nargs='?', default="fiona.listlayers(args.GDB)", help="Nombre del featureclass a generalizar. Si lo omite, el sistema le mostrara un listado de los featuresClass que contiene su geodatabase")
+	parser.add_argument('FEAT',type=str,  nargs='?', default="fiona.listlayers(args.GDB)", help="Nombre del featureclass a generalizar. Si lo omite, el sistema le mostrara un listado de los featuresClass que contiene su geodatabase")
+	parser.add_argument("CAMP",type=str, nargs='?', default="jerarquia,clase,num_hab", help="Campos separados por coma que se utilizaran como criterios de importancia")
 	parser.add_argument("DIST",type=int, nargs='?', default=20000, help="Distancia en metros que deberan de existir entre dos puntos del resultado. Default: 20000")
 	parser.add_argument("VER",type=int, nargs='?', default=1, help="Genera y muestra un Mapa Web con el resultado. Default: 1")	
 	args = parser.parse_args()
+	imp(dict(gdb=args.GDB,feat=args.FEAT,camp=args.CAMP.split(","),dist=args.DIST,ver=args.VER))
 	if args.FEAT=="fiona.listlayers(args.GDB)":
 		import fiona
 		print(eval(args.FEAT))
 	else:
-		main(gdb=args.GDB,feat=args.FEAT,dist=args.DIST,ver=args.VER)
+		main(gdb=args.GDB,feat=args.FEAT,camp=args.CAMP.split(","),dist=args.DIST,ver=args.VER)
 else:
-    main(gdb='datos/Generalizacion.gdb', feat='BCs_', dist=20000,ver=1) 
+    main(gdb='datos/Generalizacion.gdb', feat='BCs_', camp="jerarquia,clase,num_hab".split(","),dist=20000,ver=1) 

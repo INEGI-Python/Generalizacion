@@ -9,6 +9,4 @@ def imp(text):
 def colores(v):
     return "red" if v==True else "gray"
 
-gdb="datos/Generalizacion.gdb"
-distancia = 0
-datos,geometria=[],[]
+

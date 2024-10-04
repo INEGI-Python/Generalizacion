@@ -1,7 +1,7 @@
 import argparse as ag
 import geopandas as gpd
 import folium as fol
-from atajos import imp,distancia,datos,geometria,gdb
+from atajos import imp,distancia,datos,geometria,gdb,fechaHora
 from time import time as t
 import shapely as sh
 
@@ -51,7 +51,8 @@ def main(**params):
 	ver = params['ver']
 
 	t1 = t()
-	_dataF = gpd.read_file(gdb,layer=feat,columns=["cve_edo","cve_mun","cve_loc","nombre"]+camp)
+	_dataF = gpd.read_file(gdb,layer=feat)
+	_dataF["jera"]=1
 	_dataF["gpo"]=0
 	_dataF["isvisible"]=True
 	_dataF["distancia"]=object()  #pd.DataFrame(data={'data':data})
@@ -77,7 +78,7 @@ def main(**params):
 		imp("Grupo %d »» No. elementos: %d " % (i,_cantG))
 		if _cantG>1:
 			gpoX = agrupados.iloc[porGPO[i]]
-			gpoX = gpoX.sort_values(by=camp,ascending=[True,False])
+			gpoX = gpoX.sort_values(by=camp,ascending=[True,True,False])
 			for _g in gpoX.index:
 				buf = gpoX.loc[_g,'geometry'].buffer(distancia)
 				res = gpoX[gpoX.loc[:,'geometry'].intersects(buf)]
@@ -90,7 +91,9 @@ def main(**params):
 
 	imp("Tiempo del algoritmo: %.3f " % float(t()-t1))
 	imp("Guardando resultado...")
-	agrupados.to_file(f"RESULT-{feat}.shp")
+	from os import system as cmd
+	cmd(f"mkdir RESULT-{feat} \n cd RESULT-{feat} \n mkdir {distancia}")
+	agrupados.to_file(f"RESULT-{feat}/{distancia}/{fechaHora()}.shp")
 	if ver==1:
 		visibles = agrupados.loc[agrupados['isvisible']==True,]
 		ocultar = agrupados.loc[agrupados['isvisible']==False,]
@@ -109,7 +112,7 @@ if __name__ == "__main__":
 	parser = ag.ArgumentParser(description="Esta aplicacion generaliza una capa  de   tipo punto, reduciendo la cantidad de elementos basados en una distancia dada")
 	parser.add_argument('GDB',type=str, help="Ruta absoluta o relativa  de  la geodatabase")
 	parser.add_argument('FEAT',type=str,  nargs='?', default="fiona.listlayers(args.GDB)", help="Nombre del featureclass a generalizar. Si lo omite, el sistema le mostrara un listado de los featuresClass que contiene su geodatabase")
-	parser.add_argument("CAMP",type=str, nargs='?', default="jerarquia,clase,num_hab", help="Campos separados por coma que se utilizaran como criterios de importancia")
+	parser.add_argument("CAMP",type=str, nargs='?', default="jera,geografico,num_hab", help="Campos separados por coma que se utilizaran como criterios de importancia")
 	parser.add_argument("DIST",type=int, nargs='?', default=20000, help="Distancia en metros que deberan de existir entre dos puntos del resultado. Default: 20000")
 	parser.add_argument("VER",type=int, nargs='?', default=1, help="Genera y muestra un Mapa Web con el resultado. Default: 1")	
 	args = parser.parse_args()

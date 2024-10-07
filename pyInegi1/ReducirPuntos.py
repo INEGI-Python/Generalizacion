@@ -108,7 +108,7 @@ def main(**params):
 
 
 
-if __name__ == "__main__":
+if False: #__name__ == "__main__":
 	parser = ag.ArgumentParser(description="Esta aplicacion generaliza una capa  de   tipo punto, reduciendo la cantidad de elementos basados en una distancia dada")
 	parser.add_argument('GDB',type=str, help="Ruta absoluta o relativa  de  la geodatabase")
 	parser.add_argument('FEAT',type=str,  nargs='?', default="fiona.listlayers(args.GDB)", help="Nombre del featureclass a generalizar. Si lo omite, el sistema le mostrara un listado de los featuresClass que contiene su geodatabase")
@@ -123,4 +123,4 @@ if __name__ == "__main__":
 	else:
 		main(gdb=args.GDB,feat=args.FEAT,camp=args.CAMP.split(","),dist=args.DIST,ver=args.VER)
 else:
-    main(gdb='datos/Generalizacion.gdb', feat='BCs_', camp="jerarquia,clase,num_hab".split(","),dist=20000,ver=1) 
+    main(gdb='datos/Generalizacion.gdb', feat='BCs_', camp="jera,geografico,num_hab".split(","),dist=20000,ver=1) 

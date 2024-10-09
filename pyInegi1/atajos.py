@@ -4,7 +4,7 @@ def sepa(c="*-*-"):
 
 def fechaHora():
     t = dt.datetime.today()
-    return str(t)[1:-8].replace(" ","-").replace(":","")
+    return str(t)[:-7].replace(" ","-").replace(":","")
 
 def imp(text):
     t = dt.datetime.today()
@@ -13,6 +13,3 @@ def imp(text):
 def colores(v):
     return "red" if v==True else "gray"
 
-gdb="datos/Generalizacion.gdb"
-distancia = 0
-datos,geometria=[],[]

@@ -3,7 +3,7 @@ import geopandas as gpd
 import folium as fol
 from time import time as t
 import shapely as sh
-from atajos import imp,fechaHora
+from .atajos import imp,fechaHora
 
 
 def crearGpos(_dataF,CRS,distancia):

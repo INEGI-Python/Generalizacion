@@ -1,3 +1,7 @@
 [build-system]
-require=["setuptools"]
+require=["setuptools","some-build-toolkit",]
 build-backend = "setuptools.build-meta"
+
+[project]
+name="pyInegi"
+version="1.0.0"

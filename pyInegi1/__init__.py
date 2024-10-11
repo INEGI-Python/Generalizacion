@@ -1,6 +1,8 @@
 from .basico import *
-from .ReducirPuntos import main
 from .atajos import imp,fechaHora
+from .ReducirPuntos import main
+
+
 __version__ = "1.0.0"
 
 

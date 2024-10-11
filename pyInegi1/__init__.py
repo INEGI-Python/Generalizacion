@@ -1,8 +1,7 @@
-from .basico import Basico
+from .basico import *
 from .ReducirPuntos import main
+from .atajos import imp,fechaHora
 __version__ = "1.0.0"
 
 
-
-
-__ALL__=["Basico","main"]
+__ALL__=["basico","main"]

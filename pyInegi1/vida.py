@@ -22,7 +22,7 @@ class myMatrix:
         for v in vivas:
             s.data[v[1]][v[0]].setStatus(1)
     def ver(s):
-        os.system("clear")
+        os.system("cls")
         for x in list(s.data.keys()):
             for y in list(s.data[x].keys()):
                 print("▓" if s.data[x][y].getStatus()==1 else "░", sep="", end="")
@@ -76,12 +76,12 @@ def reglas(val,suma):
 vid = myMatrix(r,c)
 myData = vid.data
 myCells = []
-#patron = linea("h",75,50,88,[8,14,15,16,20,21,22,23,24,25,33])
-print(linea("h",60,100,105))
+patron = linea("h",75,50,88,[8,14,15,16,20,21,22,23,24,25,33])
+#print(linea("h",60,100,105))
 print("-*-*-***-*-*-*-***--*-*-**-*-*-*-*-*-*-*-*-*-*--*-*-*-*-")
 
-c1 = [c for c in cuadro(100,10,100)]
-patron = c1+linea("h",100,20,49)
+#c1 = [c for c in cuadro(100,10,100)]
+#patron = c1+linea("h",100,20,49)
 vid.act(list(patron))
 
 for _r in range(r):
@@ -95,7 +95,7 @@ for _r in range(r):
 #gDF.plot()
 vid.ver()
 time.sleep(10)
-os.system("clear")
+os.system("cls")
 
 turno=0
 while True:
@@ -104,7 +104,7 @@ while True:
     
     #gDF = geo.GeoDataFrame(geometry=[v for v in vivas],crs="EPSG:4326")
     #gDF.plot(color="red",marker="*",markersize=2)
-    time.sleep(1)
+    #time.sleep(1)
     turno+=1
     
   

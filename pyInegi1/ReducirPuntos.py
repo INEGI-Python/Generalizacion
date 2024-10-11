@@ -1,7 +1,6 @@
 import argparse as ag
 import geopandas as gpd
 import folium as fol
-from atajos import imp,fechaHora
 from time import time as t
 import shapely as sh
 
@@ -95,7 +94,7 @@ def main(**params):
 			os.mkdir(_d)
 		os.chdir(_d)
 	archivo=f"{fechaHora()}.shp"
-	agrupados.to_file(archivo)
+	agrupados.to_file(archivo,encoding="UTF-8")
 	imp(f"{os.getcwd().replace("\\","/")}/{archivo}")
 	os.chdir(miDir)
 	if ver==1:
